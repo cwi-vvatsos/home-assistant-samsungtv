@@ -7,9 +7,9 @@ https://community.home-assistant.io/t/control-newer-samsung-tvs/29895
 I've fixed an issue with the source list to make it compatible with the api calls to my H6400 TV
 
 ### Some research sources
-[upnp - control Samsung TV](https://forum.iobroker.net/viewtopic.php?t=4449)
-[Samsung-TV-Hacks](https://github.com/ohjeongwook/Samsung-TV-Hacks/blob/master/Servers/smp4.py)
-[Samsung Smart TV APIs and more](https://github.com/casperboone/homey-samsung-smart-tv/blob/master/samsung.md)
+- [upnp - control Samsung TV](https://forum.iobroker.net/viewtopic.php?t=4449)
+- [Samsung-TV-Hacks](https://github.com/ohjeongwook/Samsung-TV-Hacks/blob/master/Servers/smp4.py)
+- [Samsung Smart TV APIs and more](https://github.com/casperboone/homey-samsung-smart-tv/blob/master/samsung.md)
 
 ### Future plans:
  - Get current playing channel
