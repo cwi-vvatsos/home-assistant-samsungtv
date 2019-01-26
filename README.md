@@ -9,6 +9,15 @@ I've been also trying to improve this as a media source with some additions
 
 **Disclaimer:** I'm no python programmer by far. My code might be crude but i will try to make it as optimized as i can
 
+### Installation
+- Put samsungtv.py inside *{homeassistantconfigfolder}*/custom_components/media_player/ (create the folder structure if it not exists)
+- Edit the configuration.yaml accordingly:
+```
+media_player:
+  - platform: samsungtv
+    host: 10.0.0.5
+````    
+
 ### Some research sources
 - [upnp - control Samsung TV](https://forum.iobroker.net/viewtopic.php?t=4449)
 - [Samsung-TV-Hacks](https://github.com/ohjeongwook/Samsung-TV-Hacks/blob/master/Servers/smp4.py)
