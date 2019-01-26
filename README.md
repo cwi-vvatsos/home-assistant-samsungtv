@@ -16,6 +16,7 @@ I've been also trying to improve this as a media source with some additions
 media_player:
   - platform: samsungtv
     host: 10.0.0.5
+    usegoogle: True # Use google to auto-search for media title
 ````    
 
 ### Some research sources
@@ -26,4 +27,5 @@ media_player:
 ### Future plans:
  - ~~Get current playing channel~~ ✓
  - ~~Retrieve channel list~~ ✓
+ - ~~Support media title w/ google image search~~ ✓
  - Make it so you can change the media/channel (if possible)
