@@ -7,7 +7,7 @@ https://home-assistant.io/components/media_player.samsungtv/
 import logging
 import socket
 
-REQUIREMENTS = ['wakeonlan==0.2.2', 'beautifulsoup4==4.6.0', 'requests==2.21.0']
+REQUIREMENTS = ['wakeonlan==0.2.2', 'beautifulsoup4==4.6.0', 'requests==2.21.0', 'google-images-download==2.5.0']
 
 from bs4 import BeautifulSoup
 
@@ -28,6 +28,7 @@ import homeassistant.helpers.config_validation as cv
 _LOGGER = logging.getLogger(__name__)
 
 CONF_TIMEOUT = 'timeout'
+CONF_USEGOOGLE = 'usegoogle'
 
 DEFAULT_NAME = 'Samsung TV Remote'
 DEFAULT_PORT = 55000
@@ -49,10 +50,14 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 # pylint: disable=unused-argument
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Set up the Samsung TV platform."""
+
+
     known_devices = hass.data.get(KNOWN_DEVICES_KEY)
     if known_devices is None:
         known_devices = set()
         hass.data[KNOWN_DEVICES_KEY] = known_devices
+
+    _googleImage = config.get(CONF_USEGOOGLE)
 
     # Is this a manual configuration?
     if config.get(CONF_HOST) is not None:
@@ -78,7 +83,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     ip_addr = socket.gethostbyname(host)
     if ip_addr not in known_devices:
         known_devices.add(ip_addr)
-        add_devices([SamsungTVDevice(host, port, name, timeout, mac)])
+        add_devices([SamsungTVDevice(host, port, name, timeout, mac, _googleImage)])
         _LOGGER.info("Samsung TV %s:%d added as '%s'", host, port, name)
     else:
         _LOGGER.info("Ignoring duplicate Samsung TV %s:%d", host, port)
@@ -87,9 +92,17 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 class SamsungTVDevice(MediaPlayerDevice):
     """Representation of a Samsung TV."""
 
-    def __init__(self, host, port, name, timeout, mac):
+    def __init__(self, host, port, name, timeout, mac, googleImage):
         """Initialize the Samsung device."""
         from wakeonlan import wol
+        from google_images_download import google_images_download
+
+        if googleImage:
+            self._googleImage = google_images_download.googleimagesdownload()
+            self._programImages = {}
+        else:
+            self._googleImage = None
+
         # Save a reference to the imported classes
         self._name = name
         self._mac = mac
@@ -319,14 +332,43 @@ class SamsungTVDevice(MediaPlayerDevice):
     def media_title(self):
         """Title of current playing media."""
         if self._currentChannel is not None:
-            _chName = self._currentChannel.title
+            return self._currentChannel.title+' - '+self.current_playing_program
         else:
             return 'Unknown'
+
+    @property
+    def current_playing_program(self):
         _ch = '{}'.format(self._currentChannel.major_ch)
         if _ch in self._channelsProgram:
-            return _chName+' - '+str(self._channelsProgram[_ch]['title'])
+            return str(self._channelsProgram[_ch]['title'])
         else:
-            return _chName+' - Unknown'
+            return 'Unknown'
+
+    @property
+    def media_image_url(self):
+        """Return the media image URL."""
+        if self._googleImage is None:
+            return None
+        if self.current_playing_program == 'Unknown':
+            return None
+        if self.current_playing_program in self._programImages:
+            return self._programImages[self.current_playing_program]
+        else:
+            arguments = {"keywords":self.current_playing_program,"limit":1,"print_urls":True,"no_download":True,"language":False,
+                         "time_range":False,"exact_size":False,"color":None,"color_type":None,"usage_rights":None,"size":">800*600",
+                         "type":None,"time":None,"aspect_ratio":"wide","format":None,"offset":False,"metadata":False,
+                         "socket_timeout":False,"prefix":False,"print_size":False,"print_paths":False,"extract_metadata":False,
+                         "no_numbering":False,"thumbnail":False,"delay":False}
+            _gparams = self._googleImage.build_url_parameters(arguments)
+            _gurl = self._googleImage.build_search_url(arguments["keywords"],_gparams,None,None,None,None)
+            _html = self._googleImage.download_page(_gurl)
+            _items,_errorCount,_abs_path = self._googleImage._get_all_items(_html,"","",arguments["limit"],arguments)
+            if len(_items)>0:
+               self._programImages[self.current_playing_program] = _items[0]['image_link']
+               return _items[0]['image_link']
+            else:
+               return ''
+#        return "https://image.shutterstock.com/z/stock-vector-television-with-an-inscription-tv-program-logo-design-vector-illustration-708238828.jpg"
 
     @property
     def supported_features(self):
