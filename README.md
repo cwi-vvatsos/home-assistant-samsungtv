@@ -1,6 +1,8 @@
 # home-assistant-samsungtv
 A samsungtv.py fork to work with Samsung H6400
 
+<img src="https://i.ibb.co/zZQMHCK/samsung.jpg">
+
 This code is based on a post of MrUart232 @ home-assistant community<br />
 https://community.home-assistant.io/t/control-newer-samsung-tvs/29895
 
@@ -25,7 +27,7 @@ media_player:
 - [Samsung Smart TV APIs and more](https://github.com/casperboone/homey-samsung-smart-tv/blob/master/samsung.md)
 - [samsung smart tv channel switcher](https://github.com/yath/sstcs/)
 ### Future plans:
- - ~~Get current playing channel~~ ✓
- - ~~Retrieve channel list~~ ✓
- - ~~Support media image w/ google image search~~ ✓
- - Make it so you can change the media/channel (if possible)
+- [x] Get current playing channel
+- [x] Retrieve channel list
+- [x] Support media image w/ google image search
+- [ ] Make it so you can change the media/channel (if possible)
